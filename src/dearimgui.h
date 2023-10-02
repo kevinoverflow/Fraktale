@@ -1,6 +1,8 @@
 #ifndef DEARIMGUI_H
 #define DEARIMGUI_H
 
+#include <functional>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
