@@ -1,0 +1,19 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "fraktale",
+    "version": "1.0.0",
+    "dependencies": [
+        "glfw3",
+        "glew",
+        {
+            "name": "imgui",
+            "default-features": false,
+            "features": [
+                "docking-experimental",
+                "glfw-binding",
+                "opengl3-binding"
+            ]
+        },
+        "cmakerc"
+    ]
+}
