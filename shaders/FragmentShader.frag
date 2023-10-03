@@ -8,9 +8,10 @@ uniform vec2 u_offset;
 uniform float u_zoom;
 
 vec2 map(vec2 coord) {
-    vec2 c = vec2(coord.x / u_resolution.x * 3.5 - 2.5, coord.y / u_resolution.y * 2.0 - 1.0);
-
+    vec2 c = (2 * coord - u_resolution.xy) / u_resolution.y;
+    c.x += -0.5;
     return c;
+
 }
 
 vec2 normalize_offset(vec2 offset) {
