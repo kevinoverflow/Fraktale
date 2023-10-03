@@ -5,8 +5,8 @@
 #include "shader.h"
 
 static char* programName = "Fraktale";
-static int width = 1280;
-static int height = 720;
+int width = 1280;
+int height = 720;
 
 GLFWwindow* window = nullptr;
 
@@ -20,6 +20,9 @@ static GLfloat vertices[] = {
 static GLint indices[] = {0, 1, 2, 2, 3, 0};
 
 static Shader* shader = new Shader();
+
+double offsetX, offsetY;
+double zoom = 1;
 
 int main(int argc, char** argv) {
   if (window_init(width, height, programName) != 0) {
@@ -58,6 +61,10 @@ int main(int argc, char** argv) {
     glDisableVertexAttribArray(0);
 
     shader->Attach();
+    shader->SetUniform("u_resolution", (GLfloat)width, (GLfloat)height);
+    shader->SetUniform("u_iterations", (GLfloat)50);
+    shader->SetUniform("u_offset", (GLfloat)offsetX, (GLfloat)offsetY);
+    shader->SetUniform("u_zoom", (GLfloat)zoom);
 
     imgui_update([]() {
       ImGui::Begin("Hello, World!");
