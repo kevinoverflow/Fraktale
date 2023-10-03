@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "dearimgui.h"
-#include "window.h"
 #include "shader.h"
+#include "window.h"
 
 static char* programName = "Fraktale";
 int width = 1280;
 int height = 720;
+float scale = 1.0f;
 
 GLFWwindow* window = nullptr;
 
@@ -22,7 +23,7 @@ static GLint indices[] = {0, 1, 2, 2, 3, 0};
 static Shader* shader = new Shader();
 
 double offsetX, offsetY;
-double zoom = 1;
+double zoom = 0.75;
 
 int main(int argc, char** argv) {
   if (window_init(width, height, programName) != 0) {
@@ -50,6 +51,13 @@ int main(int argc, char** argv) {
   shader->Load(GL_VERTEX_SHADER, "VertexShader.vert");
   shader->Load(GL_FRAGMENT_SHADER, "FragmentShader.frag");
   shader->Link();
+
+  glfwGetFramebufferSize(window, &width, &height);
+  glViewport(0, 0, width, height);
+
+  int wwidth;
+  glfwGetWindowSize(window, &wwidth, nullptr);
+  scale = (float)width / (float)wwidth;
 
   while (!window_should_close()) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
