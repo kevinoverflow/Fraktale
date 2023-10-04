@@ -8,6 +8,7 @@ set(APP_VERSION 1.0.0)
 find_package(CMAKERC REQUIRED)
 find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(glm REQUIRED)
 find_package(IMGUI REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -34,6 +35,7 @@ add_executable(${APP_TARGET} MACOSX_BUNDLE ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(${APP_TARGET} PRIVATE
     ${GLFW3_LIBRARIES}
     GLEW::GLEW
+    glm::glm
     imgui::imgui
     ${OPENGL_LIBRARIES} 
     Fraktale::Shaders
