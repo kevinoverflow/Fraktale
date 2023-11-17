@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include <complex>
+#include <iostream>
 #include <vector>
 
 #include "dearimgui.h"
@@ -105,18 +106,30 @@ int main(int argc, char** argv) {
 
     imgui_update([]() {
       ImGui::Begin("Einstellungen");
-      ImGui::SeparatorText("Render");
 
+      ImGui::SeparatorText("Position");
+      ImGui::Text("Mittelpunkt %.2f%+.2fi", mapToComplex(offsetX, offsetY).real(),
+                  mapToComplex(offsetX, offsetY).imag());
+
+      ImGui::Text("Zoom: %.2f", zoom);
+      ImGui::Button("Zurücksetzen");
+      if (ImGui::IsItemClicked()) {
+        offsetX = 0.0;
+        offsetY = 0.0;
+        zoom = 0.75;
+      }
+
+      ImGui::SeparatorText("Render");
       const char* fractalTypes[] = {"Mandelbrot", "Julia", "Burning Ship"};
       ImGui::Combo("Fraktal", &fractal, fractalTypes, IM_ARRAYSIZE(fractalTypes));
-      
+
       if (fractal == Fractal::Julia) {
         ImGui::SliderFloat("Realteil", &juliaReal, -2.0f, 2.0f);
         ImGui::SliderFloat("Imaginärteil", &juliaImag, -2.0f, 2.0f);
       }
 
       ImGui::SliderInt("Iterationen", &iterations, 1, 256);
-     
+
       ImGui::SeparatorText("Farbe");
       ImGui::RadioButton("Einfarbig", &colorAlgorithm, ColorAlgorithm::Single);
       ImGui::SameLine();
@@ -130,6 +143,28 @@ int main(int argc, char** argv) {
         ImGui::Dummy(ImVec2(0.0f, 30.0f));
         ImGui::VectorTable(&a, &b, &c, &d);
       }
+
+      ImGui::SeparatorText("Info");
+      ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
+      ImGui::Text("Auflösung: %dx%d@%.2fx", width, height, scale);
+
+      // platform info
+      ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
+      ImGui::Text("OpenGL Version: %s", glGetString(GL_VERSION));
+
+      ImGui::SeparatorText("Über");
+      ImGui::TextWrapped(
+          "Fraktale ist ein interaktives Programm, um Fraktale zu visualisieren und zu "
+          "erkunden.");
+      ImGui::Separator();
+      ImGui::Text("Entwickelt von: Kevin Hoàng");
+      ImGui::Text("Version: 1.0.0");
+
+      ImGui::Button("Quellcode");
+      if (ImGui::IsItemClicked()) {
+        OsOpenInShell("https://www.github.com/kevinoverflow/Fraktale");
+      }
+
       ImGui::End();
     });
 
