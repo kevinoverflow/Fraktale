@@ -86,8 +86,7 @@ vec3 colorize_cosine(float n) {
     if(n == u_iterations) {
         return vec3(0.0, 0.0, 0.0);
     }
-
-    float t = n / u_iterations + 0.5;
+    float t = min(n / u_iterations + 0.5, 1.0);
 
     return u_a.xyz + u_b.xyz * cos(6.28318 * (u_c.xyz * t + u_d.xyz));
 }
