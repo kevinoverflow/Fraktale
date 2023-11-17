@@ -6,6 +6,10 @@
 #include "glm/glm.hpp"
 #include "imgui_internal.h"
 
+#ifdef  _WIN32
+#include <windows.h>
+#endif
+
 extern int width;
 extern int height;
 
@@ -123,7 +127,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
 
 void OsOpenInShell(const char* path) {
 #ifdef _WIN32
-  ::ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
+ ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWNORMAL);
 #else
 #if __APPLE__
   const char* open_executable = "open";
