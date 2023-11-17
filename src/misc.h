@@ -1,8 +1,20 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <complex>
+
 #include "glm/glm.hpp"
 #include "imgui_internal.h"
+
+extern int width;
+extern int height;
+
+std::complex<double> mapToComplex(double offsetX, double offsetY) {
+  double real = 1 + (2.0 * offsetX - width) / height;
+  double imag = 1 + (2.0 * offsetY - height) / height;
+
+  return std::complex<double>(real, imag);
+}
 
 enum Fractal { Mandelbrot = 0, Julia = 1, BurningShip = 2 };
 
@@ -44,10 +56,10 @@ void DrawGradientRect(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c
 void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
   if (ImGui::BeginTable("VectorTable", 4)) {
     // Table headers
-    ImGui::TableSetupColumn("Vektor", ImGuiTableColumnFlags_None);
-    ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_None);
-    ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_None);
-    ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_None);
+    ImGui::TableSetupColumn("Parameter", ImGuiTableColumnFlags_None);
+    ImGui::TableSetupColumn("Rot", ImGuiTableColumnFlags_None);
+    ImGui::TableSetupColumn("Grün", ImGuiTableColumnFlags_None);
+    ImGui::TableSetupColumn("Blau", ImGuiTableColumnFlags_None);
     ImGui::TableHeadersRow();
 
     // Function to create a SliderFloat for a vector component with sensible defaults
@@ -71,7 +83,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
     // Row for vector 'a'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("a");                                     // Display the vector name
+    ImGui::Text("Y-Offset");                              // Display the vector name
     CreateSliderFloat("##a_x", &a->x, -3.141f, 3.141f);   // Slider for 'a.x'
     CreateSliderFloatY("##a_y", &a->y, -3.141f, 3.141f);  // Slider for 'a.y'
     CreateSliderFloatZ("##a_z", &a->z, -3.141f, 3.141f);  // Slider for 'a.z'
@@ -81,7 +93,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
     // Row for vector 'b'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("b");                                     // Display the vector name
+    ImGui::Text("Amplitude");                             // Display the vector name
     CreateSliderFloat("##b_x", &b->x, -3.141f, 3.141f);   // Slider for 'b.x'
     CreateSliderFloatY("##b_y", &b->y, -3.141f, 3.141f);  // Slider for 'b.y'
     CreateSliderFloatZ("##b_z", &b->z, -3.141f, 3.141f);  // Slider for 'b.z'
@@ -89,7 +101,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
     // Row for vector 'c'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("c");                                     // Display the vector name
+    ImGui::Text("Frequenz");                              // Display the vector name
     CreateSliderFloat("##c_x", &c->x, -3.141f, 3.141f);   // Slider for 'c.x'
     CreateSliderFloatY("##c_y", &c->y, -3.141f, 3.141f);  // Slider for 'c.y'
     CreateSliderFloatZ("##c_z", &c->z, -3.141f, 3.141f);  // Slider for 'c.z'
@@ -97,7 +109,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
     // Row for vector 'd'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("d");                                     // Display the vector name
+    ImGui::Text("Phase");                                 // Display the vector name
     CreateSliderFloat("##d_x", &d->x, -3.141f, 3.141f);   // Slider for 'd.x'
     CreateSliderFloatY("##d_y", &d->y, -3.141f, 3.141f);  // Slider for 'd.y'
     CreateSliderFloatZ("##d_z", &d->z, -3.141f, 3.141f);  // Slider for 'd.z'
@@ -108,5 +120,20 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
 }
 
 }  // namespace ImGui
+
+void OsOpenInShell(const char* path) {
+#ifdef _WIN32
+  ::ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
+#else
+#if __APPLE__
+  const char* open_executable = "open";
+#else
+  const char* open_executable = "xdg-open";
+#endif
+  char command[256];
+  snprintf(command, 256, "%s \"%s\"", open_executable, path);
+  system(command);
+#endif
+}
 
 #endif  // MISC_H
