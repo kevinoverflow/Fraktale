@@ -10,7 +10,7 @@
 #include "shader.h"
 #include "window.h"
 
-static char* programName = "Fraktale";
+static const char* programName = "Fraktale";
 int width = 1280;
 int height = 720;
 float scale = 1.0f;
