@@ -64,7 +64,7 @@ float burning_ship(vec2 c) {
     float n = 0.0;
     for(int i = 0; i < int(u_iterations); i++) {
         float xtemp = z.x * z.x - z.y * z.y + c.x;
-        z.y = -abs(2.0 * z.x * z.y) + c.y;  // Negate the imaginary part here
+        z.y = -abs(2.0 * z.x * z.y) + c.y; // Negate the imaginary part here
         z.x = abs(xtemp);
         n += 1.0;
         if(length(z) > 2.0) {
@@ -86,7 +86,7 @@ vec3 colorize_cosine(float n) {
     if(n == u_iterations) {
         return vec3(0.0, 0.0, 0.0);
     }
-    float t = min(n / u_iterations + 0.5, 1.0);
+    float t = n / u_iterations + 0.5;
 
     return u_a.xyz + u_b.xyz * cos(6.28318 * (u_c.xyz * t + u_d.xyz));
 }
