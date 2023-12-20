@@ -38,6 +38,7 @@ bool Shader::Load(GLenum shaderType, const char* shaderFileName) {
     char* errorMessage = (char*)malloc(infoLogLength + 1);
     glGetShaderInfoLog(shader, infoLogLength, nullptr, errorMessage);
     std::cerr << "[FEHLER] Shader Kompilierung fehlgeschlagen: " << errorMessage << std::endl;
+    free(errorMessage);
     return false;
   }
 
@@ -62,6 +63,7 @@ bool Shader::Link() {
     char* errorMessage = (char*)malloc(infoLogLength + 1);
     glGetProgramInfoLog(program, infoLogLength, nullptr, errorMessage);
     std::cerr << "[FEHLER] Verlinkung fehlgeschlagen: " << errorMessage << std::endl;
+    free(errorMessage);
     return false;
   }
 
