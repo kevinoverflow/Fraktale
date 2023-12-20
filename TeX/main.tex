@@ -1,0 +1,59 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\renewcommand{\baselinestretch}{1.2}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\hyphenpenalty=10000
+
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{blindtext}
+\usepackage{lettrine}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\geometry{right=3.0cm, left=4.0cm, bottom=2.5cm }
+
+\usepackage{array}
+\usepackage{titlesec}
+\usepackage{color}
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+
+\sloppy % Enable more relaxed line breaking
+
+\usepackage{tikz}
+
+\begin{document}
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.15\textwidth]{logo.png}\par\vspace{1cm}
+	{\scshape\ Bertolt-Brecht-Gymnasium \par}
+	{\scshape\ Schwarzenberg \par}
+	\vspace{1cm}
+	{\scshape\Large Komplexe Leistung\par}
+	\vspace{1.5cm}
+	{\huge\bfseries Fraktale\par}
+	\vspace{2cm}
+	{\Large\textsc{Kevin Hoang}\par}
+	\vfill
+	Betreuer \par
+	Herr~\textsc{Heller} \vfill
+	% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+
+\include{Einleitung.tex}
+\include{Theoretischer-Teil.tex}
+\include{Praktischer-Teil.tex}
+\include{Fazit.tex}
+\include{Anhang.tex}
+
+\end{document}
