@@ -1,11 +1,8 @@
 ﻿#include <complex>
-#include <iostream>
-#include <vector>
 
 #include "dearimgui.h"
 #include "glm/glm.hpp"
 #include "imgui.h"
-#include "imgui_internal.h"
 #include "misc.h"
 #include "shader.h"
 #include "window.h"
