@@ -11,33 +11,37 @@ uniform float u_fractal;
 
 uniform float u_color_scheme;
 
-// Julia set
+// Komplexe Zahl für Julia-Menge
 uniform vec2 u_julia_c;
 
-// Single color
+// Farbe für Einfärbung
 uniform vec3 u_color;
 
-// Consine gradient 
+// Parameter für Farbverlauf
 uniform vec3 u_a;
 uniform vec3 u_b;
 uniform vec3 u_c;
 uniform vec3 u_d;
 
+// Pixelkoordinaten in komplexe Zahlen umwandeln
 vec2 map(vec2 coord) {
     vec2 c = (2 * coord - u_resolution.xy) / u_resolution.y;
     c.x += -0.5;
     return c;
 }
 
+// Offset in [-3.5, 3.5] x [-2.0, 2.0] normalisieren
 vec2 normalize_offset(vec2 offset) {
     return vec2(offset.x / u_resolution.x * 3.5, offset.y / u_resolution.y * 2.0);
 }
 
+// Mandelbrot-Menge
 float mandelbrot(vec2 c) {
     vec2 z = vec2(0.0, 0.0);
     float n = 0.0;
     for(int i = 0; i < int(u_iterations); i++) {
-        z = vec2(z.x * z.x - z.y * z.y + c.x, 2.0 * z.x * z.y + c.y);
+        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
+        z += c;
         n += 1.0;
         if(length(z) > 2.0) {
             break;
@@ -46,11 +50,13 @@ float mandelbrot(vec2 c) {
     return n;
 }
 
+// Julia-Menge
 float julia(vec2 c) {
     vec2 z = c;
     float n = 0.0;
     for(int i = 0; i < int(u_iterations); i++) {
-        z = vec2(z.x * z.x - z.y * z.y + u_julia_c.x, 2.0 * z.x * z.y + u_julia_c.y);
+        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
+        z += u_julia_c;
         n += 1.0;
         if(length(z) > 2.0) {
             break;
@@ -59,6 +65,7 @@ float julia(vec2 c) {
     return n;
 }
 
+// Burning Ship
 float burning_ship(vec2 c) {
     vec2 z = vec2(0.0, 0.0);
     float n = 0.0;
@@ -74,6 +81,7 @@ float burning_ship(vec2 c) {
     return n;
 }
 
+// Einfärbung
 vec3 colorize_single(float n) {
     if(n == u_iterations) {
         return vec3(0.0, 0.0, 0.0);
@@ -82,12 +90,12 @@ vec3 colorize_single(float n) {
     return u_color * vec3(hue, hue, hue);
 }
 
-vec3 colorize_cosine(float n) {
+// Farbverlauf
+vec3 colorize_gradient(float n) {
     if(n == u_iterations) {
         return vec3(0.0, 0.0, 0.0);
     }
     float t = n / u_iterations + 0.5;
-
     return u_a.xyz + u_b.xyz * cos(6.28318 * (u_c.xyz * t + u_d.xyz));
 }
 
@@ -113,7 +121,7 @@ void main() {
             fragColor = vec4(colorize_single(n), 1.0);
             break;
         case 1:
-            fragColor = vec4(colorize_cosine(n), 1.0);
+            fragColor = vec4(colorize_gradient(n), 1.0);
             break;
     }
 }

@@ -14,20 +14,20 @@ void Shader::Init() {
 bool Shader::Load(GLenum shaderType, const char* shaderFileName) {
   GLuint shader = glCreateShader(shaderType);
 
-  // Load the shader file from CMRC
+  // Shader Datei laden
   auto fs = cmrc::Shaders::get_filesystem();
   auto shaderFile = fs.open(shaderFileName);
 
-  // Read the contents of the file
+  // Shader Datei in einen String umwandeln
   auto shaderSource = std::string(shaderFile.begin(), shaderFile.end());
 
-  // Compile the shader
+  // Shader kompilieren
   std::cout << "[INFO] " << shaderFileName << " wird kompiliert" << std::endl;
   const char* c_str = shaderSource.c_str();
   glShaderSource(shader, 1, &c_str, nullptr);
   glCompileShader(shader);
 
-  // Check the shader
+  // Shader überprüfen
   GLint result = GL_FALSE;
   int infoLogLength;
 
@@ -53,7 +53,7 @@ bool Shader::Link() {
   std::cout << "[INFO] Shader verlinken" << std::endl;
   glLinkProgram(program);
 
-  // Check the program
+  // Shader überprüfen
   GLint result;
   int infoLogLength;
 

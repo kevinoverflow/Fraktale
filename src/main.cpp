@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "window.h"
 
+/* ------ Variablen ------ */
 static const char* programName = "Fraktale";
 int width = 1280;
 int height = 720;
@@ -14,6 +15,7 @@ float scale = 1.0f;
 
 GLFWwindow* window = nullptr;
 
+// OpenGL Buffer
 static GLuint VAO, VBO, EBO;
 static GLfloat vertices[] = {
     -1.0f, -1.0f, 0.0f,  // A
@@ -25,9 +27,11 @@ static GLint indices[] = {0, 1, 2, 2, 3, 0};
 
 static Shader* shader = new Shader();
 
+// Mauseingabe
 double offsetX, offsetY;
 double zoom = 0.75;
 
+// Aktuelles Fraktal
 static int fractal = Fractal::Mandelbrot;
 
 static int iterations = 50;
@@ -35,58 +39,69 @@ static int iterations = 50;
 static float juliaReal = -0.4f;
 static float juliaImag = 0.8f;
 
+// Farbe
 static int colorAlgorithm = ColorAlgorithm::Single;
 
+// Farbe - Einfarbig
 static float color[3] = {1.0f, 1.0f, 1.0f};
 
+// Farbe - Farbverlauf (Parameter für die Farbverlaufsfunktion)
 static glm::vec3 a = glm::vec3(0.5f, 0.5f, 0.5f);
 static glm::vec3 b = glm::vec3(0.5f, 0.5f, 0.5f);
 static glm::vec3 c = glm::vec3(1.0f, 1.0f, 1.0f);
 static glm::vec3 d = glm::vec3(0.00f, 0.1, 0.2f);
 
+/* ------ main ------ */
 int main(int argc, char** argv) {
+  // GLFW Fenster erstellen
   if (window_init(width, height, programName) != 0) {
     return 1;
   }
+  // Dear ImGui initialisieren
   imgui_init();
 
-  // Vertex Array
+  // Vertex Array erstellen
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
 
-  // Vertex Buffer
+  // Vertex Buffer erstellen
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
 
-  // Element Buffer
+  // Element Buffer erstellen
   glGenBuffers(1, &EBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  // Shader
+  // Shader laden
   shader->Init();
   shader->Load(GL_VERTEX_SHADER, "VertexShader.vert");
   shader->Load(GL_FRAGMENT_SHADER, "FragmentShader.frag");
   shader->Link();
 
+  // Fenstergröße anpassen
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
 
+  // Skalierungsfaktor (DPI) anpassen
   int wwidth;
   glfwGetWindowSize(window, &wwidth, nullptr);
   scale = (float)width / (float)wwidth;
 
+  /* ------ Hauptschleife ------ */
   while (!window_should_close()) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // OpenGL Vertices zeichnen
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
     glDisableVertexAttribArray(0);
 
+    // Shader aktualisieren und Uniforms setzen
     shader->Attach();
     shader->SetUniform("u_resolution", (GLfloat)width, (GLfloat)height);
     shader->SetUniform("u_iterations", (GLfloat)iterations);
@@ -101,6 +116,7 @@ int main(int argc, char** argv) {
     shader->SetUniform("u_c", c.x, c.y, c.z);
     shader->SetUniform("u_d", d.x, d.y, d.z);
 
+    // Dear ImGui UI zeichnen
     imgui_update([]() {
       ImGui::Begin("Einstellungen");
 
@@ -165,9 +181,11 @@ int main(int argc, char** argv) {
       ImGui::End();
     });
 
+    // Fenster aktualisieren
     window_update();
   }
 
+  // Ressourcen freigeben
   imgui_destroy();
   window_destroy();
 

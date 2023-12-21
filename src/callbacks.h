@@ -53,19 +53,19 @@ void glfw_cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
   if (io.WantCaptureMouse) return;
 
   if (window_drag_active) {
-    // Calculate the difference in cursor position
+    // Cursor relativ zur letzten Position
     double dx = xpos - cursorX;
     double dy = ypos - cursorY;
 
-    // Scale the difference by the current zoom factor
+    // Skalierungsfaktor (DPI)
     dx = dx * scale;
     dy = dy * scale;
 
-    // Scale the offset by the current zoom factor
+    // Offset realtiv zur Zoomstufe
     offsetX -= dx / zoom;
-    offsetY += dy / zoom;  // Note the subtraction to invert the y-axis
+    offsetY += dy / zoom;
 
-    // Update cursor position
+    // Cursor auf aktuelle Position setzen
     cursorX = xpos;
     cursorY = ypos;
   }
