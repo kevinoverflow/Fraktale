@@ -27,8 +27,11 @@
 \titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
 
 \sloppy % Enable more relaxed line breaking
-
 \usepackage{tikz}
+\usepackage{pgfplots}
+
+\usepackage{biblatex}
+\addbibresource{quellen.bib}
 
 \begin{document}
 \begin{titlepage}
@@ -56,5 +59,18 @@
 \include{Praktischer-Teil.tex}
 \include{Fazit.tex}
 \include{Anhang.tex}
+\chapter*{Selbstständigkeitserklärung}
+
+Ich versichere, dass ich die Komplexe Leistung ohne fremde Hilfe angefertigt, andere als die angegebenen Quellen und Hilfsmittel nicht benutzt und mich auch sonst keiner unerlaubten Hilfe bedient habe. Alle wörtlich oder sinngemäß übernommenen Textstellen habe ich als solche kenntlich gemacht.
+\\[2ex]
+Schwarzenberg, den 21. Dezember 2023
+\flushleft
+\newlength\us
+\settowidth{\us}{-Kevin Hoang-}
+\vspace{1cm}
+\begin{tabular}{p{\us}}\hline
+\centering\footnotesize Kevin Hoang
+\end{tabular}
+
 
 \end{document}
