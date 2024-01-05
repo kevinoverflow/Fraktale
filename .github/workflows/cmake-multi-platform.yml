@@ -1,4 +1,4 @@
-name: CMake with vcpkg
+name: CMake with vcpkg on multiple platforms
 
 on:
   push:
@@ -44,22 +44,25 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Setup vcpkg
-      uses: johnwason/vcpkg-action@v5
-      id: vcpkg
-      with:
-        pkgs: boost-date-time boost-system
-        triplet: x64-windows-release
-        token: ${{ github.token }}
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
+      working-directory: ${{ github.workspace }}
 
-    - name: Configure CMake with vcpkg
-      run: >
+    - name: Install vcpkg dependencies
+      run: |
+        ./vcpkg install glfw3 glew glm imgui[core,docking-experimental,glfw-binding,opengl3-binding] cmakerc
+      working-directory: ${{ github.workspace }}
+
+    - name: Configure CMake with vcpkg toolchain
+      run: |
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        -DVCPKG_TARGET_TRIPLET=${{ steps.vcpkg.outputs.vcpkg-triplet }}
-        -DVCPKG_MANIFEST_MODE=OFF
         -S ${{ github.workspace }}
 
     - name: Build
