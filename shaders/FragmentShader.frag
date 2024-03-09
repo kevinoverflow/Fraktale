@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 
 layout(location = 0) out vec4 fragColor;
 
@@ -6,6 +6,8 @@ uniform vec2 u_resolution;
 uniform float u_iterations;
 uniform vec2 u_offset;
 uniform float u_zoom;
+
+uniform float u_crosshair;
 
 uniform float u_fractal;
 
@@ -22,6 +24,21 @@ uniform vec3 u_a;
 uniform vec3 u_b;
 uniform vec3 u_c;
 uniform vec3 u_d;
+
+bool render_crosshair(vec2 coord) {
+    float centerX = u_resolution.x / 2.0;
+    float centerY = u_resolution.y / 2.0;
+    float thickness = 1.0;
+
+    float xDist = abs(coord.x - centerX);
+    float yDist = abs(coord.y - centerY);
+
+    // Check if the pixel is close to the center
+    if((xDist < thickness && yDist < 10.0) || (yDist < thickness && xDist < 10.0)) {
+        return true;
+    }
+    return false;
+}
 
 // Pixelkoordinaten in komplexe Zahlen umwandeln
 vec2 map(vec2 coord) {
@@ -101,6 +118,13 @@ vec3 colorize_gradient(float n) {
 
 void main() {
     vec2 coord = gl_FragCoord.xy;
+    if(u_crosshair > 0.0) {
+        if(render_crosshair(coord)) {
+            fragColor = vec4(1.0, 1.0, 1.0, 0.8); // Crosshair color (white)
+            return;
+        }
+    }
+
     vec2 c = map(coord) / u_zoom + normalize_offset(u_offset);
     float n;
 
