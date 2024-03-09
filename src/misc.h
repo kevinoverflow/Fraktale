@@ -3,10 +3,12 @@
 
 #include <complex>
 
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 #include "imgui_internal.h"
 
-#ifdef  _WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -25,18 +27,27 @@ enum Fractal { Mandelbrot = 0, Julia = 1, BurningShip = 2 };
 enum ColorAlgorithm { Single = 0, Gradient = 1 };
 
 namespace ImGui {
-ImU32 CalculateColor(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d,
-                     float t) {
+struct Gradient {
+  const char* id;
+  glm::vec3 a;
+  glm::vec3 b;
+  glm::vec3 c;
+  glm::vec3 d;
+};
+
+ImU32 CalculateColor(const Gradient& gradient, float t) {
   glm::vec3 color;
-  color.x = a.x + b.x * cos(2 * 3.14159265359f * (c.x * t + d.x));
-  color.y = a.y + b.y * cos(2 * 3.14159265359f * (c.y * t + d.y));
-  color.z = a.z + b.z * cos(2 * 3.14159265359f * (c.z * t + d.z));
+  color.x =
+      gradient.a.x + gradient.b.x * cos(2 * 3.14159265359f * (gradient.c.x * t + gradient.d.x));
+  color.y =
+      gradient.a.y + gradient.b.y * cos(2 * 3.14159265359f * (gradient.c.y * t + gradient.d.y));
+  color.z =
+      gradient.a.z + gradient.b.z * cos(2 * 3.14159265359f * (gradient.c.z * t + gradient.d.z));
   color = glm::clamp(color, glm::vec3(0.0f), glm::vec3(1.0f));  // Clamp to the range [0, 1]
   return ImGui::ColorConvertFloat4ToU32(ImVec4(color.x, color.y, color.z, 1.0f));
 }
 
-void DrawGradientRect(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c,
-                      const glm::vec3& d, float gradientWidth, float gradientHeight,
+void DrawGradientRect(const Gradient& gradient, float gradientWidth, float gradientHeight,
                       int numSamples) {
   ImGuiWindow* window = ImGui::GetCurrentWindow();
   if (window->SkipItems) return;
@@ -50,14 +61,14 @@ void DrawGradientRect(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c
   // Draw the gradient by rendering horizontal lines with different colors
   for (int i = 0; i < numSamples; ++i) {
     float t = static_cast<float>(i) / static_cast<float>(numSamples - 1);
-    ImU32 color = CalculateColor(a, b, c, d, t);
+    ImU32 color = CalculateColor(gradient, t);
     ImVec2 lineStart(pos.x + i * stepSize, pos.y);
     ImVec2 lineEnd(pos.x + (i + 1) * stepSize, pos.y + gradientHeight);
     window->DrawList->AddRectFilledMultiColor(lineStart, lineEnd, color, color, color, color);
   }
 }
 
-void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
+void VectorTable(Gradient* gradient) {
   if (ImGui::BeginTable("VectorTable", 4)) {
     // Table headers
     ImGui::TableSetupColumn("Parameter", ImGuiTableColumnFlags_None);
@@ -87,36 +98,36 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
     // Row for vector 'a'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("Y-Offset");                              // Display the vector name
-    CreateSliderFloat("##a_x", &a->x, -3.141f, 3.141f);   // Slider for 'a.x'
-    CreateSliderFloatY("##a_y", &a->y, -3.141f, 3.141f);  // Slider for 'a.y'
-    CreateSliderFloatZ("##a_z", &a->z, -3.141f, 3.141f);  // Slider for 'a.z'
+    ImGui::Text("Y-Offset");                                       // Display the vector name
+    CreateSliderFloat("##a_x", &gradient->a.x, -3.141f, 3.141f);   // Slider for 'a.x'
+    CreateSliderFloatY("##a_y", &gradient->a.y, -3.141f, 3.141f);  // Slider for 'a.y'
+    CreateSliderFloatZ("##a_z", &gradient->a.z, -3.141f, 3.141f);  // Slider for 'a.z'
 
     // Repeat the above for vectors 'b', 'c', and 'd'
 
     // Row for vector 'b'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("Amplitude");                             // Display the vector name
-    CreateSliderFloat("##b_x", &b->x, -3.141f, 3.141f);   // Slider for 'b.x'
-    CreateSliderFloatY("##b_y", &b->y, -3.141f, 3.141f);  // Slider for 'b.y'
-    CreateSliderFloatZ("##b_z", &b->z, -3.141f, 3.141f);  // Slider for 'b.z'
+    ImGui::Text("Amplitude");                                      // Display the vector name
+    CreateSliderFloat("##b_x", &gradient->b.x, -3.141f, 3.141f);   // Slider for 'b.x'
+    CreateSliderFloatY("##b_y", &gradient->b.y, -3.141f, 3.141f);  // Slider for 'b.y'
+    CreateSliderFloatZ("##b_z", &gradient->b.z, -3.141f, 3.141f);  // Slider for 'b.z'
 
     // Row for vector 'c'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("Frequenz");                              // Display the vector name
-    CreateSliderFloat("##c_x", &c->x, -3.141f, 3.141f);   // Slider for 'c.x'
-    CreateSliderFloatY("##c_y", &c->y, -3.141f, 3.141f);  // Slider for 'c.y'
-    CreateSliderFloatZ("##c_z", &c->z, -3.141f, 3.141f);  // Slider for 'c.z'
+    ImGui::Text("Frequenz");                                       // Display the vector name
+    CreateSliderFloat("##c_x", &gradient->c.x, -3.141f, 3.141f);   // Slider for 'c.x'
+    CreateSliderFloatY("##c_y", &gradient->c.y, -3.141f, 3.141f);  // Slider for 'c.y'
+    CreateSliderFloatZ("##c_z", &gradient->c.z, -3.141f, 3.141f);  // Slider for 'c.z'
 
     // Row for vector 'd'
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
-    ImGui::Text("Phase");                                 // Display the vector name
-    CreateSliderFloat("##d_x", &d->x, -3.141f, 3.141f);   // Slider for 'd.x'
-    CreateSliderFloatY("##d_y", &d->y, -3.141f, 3.141f);  // Slider for 'd.y'
-    CreateSliderFloatZ("##d_z", &d->z, -3.141f, 3.141f);  // Slider for 'd.z'
+    ImGui::Text("Phase");                                          // Display the vector name
+    CreateSliderFloat("##d_x", &gradient->d.x, -3.141f, 3.141f);   // Slider for 'd.x'
+    CreateSliderFloatY("##d_y", &gradient->d.y, -3.141f, 3.141f);  // Slider for 'd.y'
+    CreateSliderFloatZ("##d_z", &gradient->d.z, -3.141f, 3.141f);  // Slider for 'd.z'
 
     // End the table
     ImGui::EndTable();
@@ -127,7 +138,7 @@ void VectorTable(glm::vec3* a, glm::vec3* b, glm::vec3* c, glm::vec3* d) {
 
 void OsOpenInShell(const char* path) {
 #ifdef _WIN32
- ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWNORMAL);
+  ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWNORMAL);
 #else
 #if __APPLE__
   const char* open_executable = "open";
