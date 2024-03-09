@@ -1,4 +1,4 @@
-﻿#include <complex>
+#include <complex>
 
 #include "dearimgui.h"
 #include "glm/glm.hpp"
@@ -12,6 +12,8 @@ static const char* programName = "Fraktale";
 int width = 1280;
 int height = 720;
 float scale = 1.0f;
+
+int crosshair = 1;
 
 GLFWwindow* window = nullptr;
 
@@ -46,13 +48,55 @@ static int colorAlgorithm = ColorAlgorithm::Single;
 static float color[3] = {1.0f, 1.0f, 1.0f};
 
 // Farbe - Farbverlauf (Parameter für die Farbverlaufsfunktion)
-static glm::vec3 a = glm::vec3(0.5f, 0.5f, 0.5f);
-static glm::vec3 b = glm::vec3(0.5f, 0.5f, 0.5f);
-static glm::vec3 c = glm::vec3(1.0f, 1.0f, 1.0f);
-static glm::vec3 d = glm::vec3(0.00f, 0.1, 0.2f);
+/*ImGui::Gradient gradients[] = {
+    {
+        "1",
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.00f, 0.1, 0.2f)
+    },
+    {
+        "2",
+        glm::vec3(1.0, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.00f, 0.0, 0.0f)
+    },
+};*/
+
+ImGui::Gradient gradients[] = {
+    {"Palette 1", glm::vec3(0.0f, 0.5f, 0.5f), glm::vec3(0.0f, 0.5f, 0.5f),
+     glm::vec3(0.0f, 0.5f, 0.33f), glm::vec3(0.0f, 0.5f, 0.66f)},
+    {"Palette 2", glm::vec3(0.938f, 0.328f, 0.718f), glm::vec3(0.659f, 0.438f, 0.328f),
+     glm::vec3(0.388f, 0.388f, 0.296f), glm::vec3(2.538f, 2.478f, 0.168f)},
+    {"Palette 3", glm::vec3(0.66f, 0.56f, 0.68f), glm::vec3(0.718f, 0.438f, 0.72f),
+     glm::vec3(0.52f, 0.8f, 0.52f), glm::vec3(-0.43f, -0.397f, -0.083f)},
+    {"Palette 4", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(0.8f, 0.8f, 0.5f), glm::vec3(0.0f, 0.2f, 0.5f)},
+    {"Palette 5", glm::vec3(0.821f, 0.328f, 0.242f), glm::vec3(0.659f, 0.481f, 0.896f),
+     glm::vec3(0.612f, 0.34f, 0.296f), glm::vec3(2.82f, 3.026f, -0.273f)},
+    {"Palette 6", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.33f, 0.67f)},
+    {"Palette 7", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.1f, 0.2f)},
+    {"Palette 8", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.3f, 0.2f, 0.2f)},
+    {"Palette 9", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.8f, 0.9f, 0.3f)},
+    {"Palette 10", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(1.0f, 0.7f, 0.4f), glm::vec3(0.0f, 0.15f, 0.2f)},
+    {"Palette 11", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(2.0f, 1.0f, 0.0f), glm::vec3(0.5f, 0.2f, 0.25f)},
+    {"Palette 12", glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
+     glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.25f, 0.25f)}};
+
+ImGui::Gradient currentGradient = {"Palette 7", glm::vec3(0.5f, 0.5f, 0.5f),
+                                   glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.00f, 0.1, 0.2f)};
 
 /* ------ main ------ */
-int main(int argc, char** argv) {
+int main() {
   // GLFW Fenster erstellen
   if (window_init(width, height, programName) != 0) {
     return 1;
@@ -107,24 +151,25 @@ int main(int argc, char** argv) {
     shader->SetUniform("u_iterations", (GLfloat)iterations);
     shader->SetUniform("u_offset", (GLfloat)offsetX, (GLfloat)offsetY);
     shader->SetUniform("u_zoom", (GLfloat)zoom);
+    shader->SetUniform("u_crosshair", (GLfloat)crosshair);
     shader->SetUniform("u_fractal", (GLfloat)fractal);
     shader->SetUniform("u_color_scheme", (GLfloat)colorAlgorithm);
     shader->SetUniform("u_julia_c", (GLfloat)juliaReal, (GLfloat)juliaImag);
     shader->SetUniform("u_color", (GLfloat)color[0], (GLfloat)color[1], (GLfloat)color[2]);
-    shader->SetUniform("u_a", a.x, a.y, a.z);
-    shader->SetUniform("u_b", b.x, b.y, b.z);
-    shader->SetUniform("u_c", c.x, c.y, c.z);
-    shader->SetUniform("u_d", d.x, d.y, d.z);
+    shader->SetUniform("u_a", currentGradient.a.x, currentGradient.a.y, currentGradient.a.z);
+    shader->SetUniform("u_b", currentGradient.b.x, currentGradient.b.y, currentGradient.b.z);
+    shader->SetUniform("u_c", currentGradient.c.x, currentGradient.c.y, currentGradient.c.z);
+    shader->SetUniform("u_d", currentGradient.d.x, currentGradient.d.y, currentGradient.d.z);
 
     // Dear ImGui UI zeichnen
-    imgui_update([]() {
+    imgugi_update([]() {
       ImGui::Begin("Einstellungen");
 
       ImGui::SeparatorText("Position");
       ImGui::Text("Mittelpunkt %.2f%+.2fi", mapToComplex(offsetX, offsetY).real(),
                   mapToComplex(offsetX, offsetY).imag());
-
       ImGui::Text("Zoom: %.2f", zoom);
+      ImGui::Checkbox("Fadenkreuz", (bool*)&crosshair);
       ImGui::Button("Zurücksetzen");
       if (ImGui::IsItemClicked()) {
         offsetX = 0.0;
@@ -152,9 +197,43 @@ int main(int argc, char** argv) {
         ImGui::ColorPicker3("Farbe", color, 0);
       }
       if (colorAlgorithm == ColorAlgorithm::Gradient) {
-        ImGui::DrawGradientRect(a, b, c, d, 200, 30, 100);
+        if (ImGui::BeginCombo("##GradientSelector", currentGradient.id)) {
+          for (int i = 0; i < IM_ARRAYSIZE(gradients); i++) {
+            bool isSelected = (currentGradient.id == gradients[i].id);
+
+            // Push style variables to adjust item width and height
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+                                ImVec2(10, 10));  // Adjust spacing between items
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+                                ImVec2(200, 50));  // Adjust padding inside each item frame
+
+            if (ImGui::Selectable(gradients[i].id, isSelected)) {
+              currentGradient = gradients[i];
+            }
+
+            if (isSelected) {
+              ImGui::SetItemDefaultFocus();  // Set focus to the selected item
+            }
+
+            // Render gradient rect as combo box item
+            ImGuiStyle& style = ImGui::GetStyle();
+
+            float h = ImGui::GetTextLineHeightWithSpacing() - style.FramePadding.y;
+            ImGui::DrawGradientRect(gradients[i], 200, h, 200);
+
+            // Pop style variables
+            ImGui::PopStyleVar(2);  // Pop both ItemSpacing and FramePadding
+          }
+          ImGui::EndCombo();
+        }
+
+        // Render the gradient rect view when the combo box is closed
+        if (!ImGui::IsPopupOpen("##GradientSelector")) {
+          ImGui::DrawGradientRect(currentGradient, 200, 30, 200);
+        }
+
         ImGui::Dummy(ImVec2(0.0f, 30.0f));
-        ImGui::VectorTable(&a, &b, &c, &d);
+        ImGui::VectorTable(&currentGradient);
       }
 
       ImGui::SeparatorText("Info");
