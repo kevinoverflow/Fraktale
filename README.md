@@ -1,6 +1,6 @@
 # Fraktale
 
-Dieses Projekt ist ein Programm zur Visualisierung von Fraktalen, das im Rahmen meiner Komplexen Leistung erstellt wurde. Mit OpenGL und ImGui können Benutzer verschiedene Arten von Fraktalen erkunden und rendern.
+This project is a fractal visualization program created as a part of the German Gymnasium's "Komplexe Leistung" project. Using OpenGL and ImGui, it enables users to explore and render many kinds of fractals.
 
 <table>
   <tr>
@@ -23,15 +23,15 @@ Dieses Projekt ist ein Programm zur Visualisierung von Fraktalen, das im Rahmen 
 
 ## Features
 
-- Wählen Sie zwischen verschiedenen Fraktaltypen: Mandelbrot, Julia und Burning Ship.
-- Passen Sie die Anzahl der Iterationen für die Darstellung an.
-- Passen Sie Farbschemata für die Fraktale an.
-- Echtzeitvorschau von Fraktalen mit benutzerfreundlichen Steuerelementen.
-- Interaktive Benutzeroberfläche mit ImGui zur Anpassung von Parametern.
+-  Choose between different fractal types: Mandelbrot, Julia, and Burning Ship.
+-  Adjust the number of iterations for rendering.
+-  Customize color schemes for the fractals.
+-  Real-time preview of fractals with user-friendly controls.
+-  Interactive interface powered by ImGui for parameter adjustment.
 
-## Bibliotheken
+## Dependencies
 
-Dieses Projekt basiert auf folgenden Bibliotheken und Werkzeugen:
+This project relies on the following libraries and tools:
 
 -  [CMake](https://cmake.org/): An open-source, cross-platform build system.
 -  [CMakeRC](https://github.com/vector-of-bool/cmrc): A Resource Compiler in a Single CMake Script.
